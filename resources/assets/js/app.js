@@ -62,6 +62,9 @@ Vue.filter('myDate', function(created){
   return moment(created).format('Do MMMM YYYY');
 })
 
+let Fire = new Vue();
+window.Fire = Fire;
+
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
