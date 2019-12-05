@@ -12,7 +12,7 @@ import moment from 'moment';
 import { Form, HasError, AlertError } from 'vform';
 
 import Swal from 'sweetalert2'
-window.swal = Swal;
+window.Swal = Swal;
 
 const Toast = Swal.mixin({
   toast: true,
