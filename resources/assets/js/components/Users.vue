@@ -7,7 +7,7 @@
             <h3 class="card-title">Users Table</h3>
 
             <div class="card-tools">
-              <button class="btn btn-success" data-toggle="modal" data-target="#addNew">
+              <button class="btn btn-success" @click="newModal">
                 Add New
                 <i class="fas fa-user-plus fa-fw"></i>
               </button>
@@ -34,7 +34,7 @@
                   <td>{{user.type | upText}}</td>
                   <td>{{user.created_at | myDate}}</td>
                   <td>
-                    <a href="#">
+                    <a href="#" @click="editModal(user)">
                       <i class="fa fa-edit blue"></i>
                     </a>
                     /
@@ -64,12 +64,13 @@
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="addNewLabel">Add New User</h5>
+            <h5 v-show="editmode" class="modal-title" id="addNewLabel">Update User</h5>
+            <h5 v-show="!editmode" class="modal-title" id="addNewLabel">Add New User</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <form @submit.prevent="createUser">
+          <form @submit.prevent="editmode ? updateUser() : createUser()">
           <div class="modal-body">
             <div class="form-group">
               <input
@@ -138,7 +139,8 @@
 
           <div class="modal-footer">
             <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary">Create</button>
+            <button v-show="editmode" type="submit" class="btn btn-success">Update</button>
+            <button v-show="!editmode" type="submit" class="btn btn-primary">Create</button>
           </div>
           </form>
 
@@ -153,8 +155,10 @@ export default {
   
   data() {
     return {
+      editmode: false,
       users : {},
       form: new Form({
+        id: "",
         name: "",
         email: "",
         password: "",
@@ -166,6 +170,18 @@ export default {
   },
 
   methods: {
+    editModal(user){
+      this.editmode = true;
+      this.form.reset();
+      $('#addNew').modal('show');
+      this.form.fill(user);
+    },
+    newModal(){
+      this.editmode = false;
+      this.form.reset();
+      $('#addNew').modal('show');
+    },
+
     deleteUser(id){
       Swal.fire({
         title: 'Are you sure?',
@@ -181,7 +197,7 @@ export default {
           this.form.delete('api/user/'+id).then(()=>{
             Swal.fire(
               'Deleted!',
-              'Your file has been deleted.',
+              'Your data has been deleted.',
               'success'
             )
             this.$Progress.finish();
@@ -212,14 +228,55 @@ export default {
          this.$Progress.finish();
       })
       .catch(() => {
-
+        this.$Progress.fail();
       })
+    },
+
+    updateUser(){
+      //console.log('Editing data');
+      this.$Progress.start();
+      this.form.put('api/user/'+this.form.id)
+      .then(() => {
+        Fire.$emit('AfterCreate');
+        $('#addNew').modal('hide');
+
+        Swal.fire(
+          'Updated!',
+          'Your data has been updated.',
+          'success'
+        )
+
+        this.$Progress.finish();
+      })
+      .catch(() => {
+        //Error
+      });
     }
   },
   created() {
-    this.loadUsers();
+    this.$Progress.start();
+
+    this.loadUsers()
+    .then(() => {
+      //Success
+      this.$Progress.finish();
+    })
+    .catch(() => {
+      //Error
+      this.$Progress.fail();
+    });
+
     Fire.$on('AfterCreate', () => {
-       this.loadUsers();
+      this.$Progress.start();
+      this.loadUsers()
+      .then(() => {
+        //Success
+        this.$Progress.finish();
+      })
+      .catch(() => {
+        //Error
+        this.$Progress.fail();
+      });
     })
     //setInterval(() => this.loadUsers(), 3000);
   }
