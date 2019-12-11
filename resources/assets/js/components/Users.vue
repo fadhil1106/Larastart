@@ -211,7 +211,15 @@ export default {
     },
 
     loadUsers(){
-      axios.get("api/user").then(({ data }) => (this.users = data.data));
+      this.$Progress.start();
+      axios.get("api/user")
+      .then(({ data }) => { 
+        this.$Progress.finish();
+        return this.users = data.data
+      })
+      .catch(() => {
+        this.$Progress.fail();
+      })
     },
 
     createUser(){
@@ -256,27 +264,10 @@ export default {
   created() {
     this.$Progress.start();
 
-    this.loadUsers()
-    .then(() => {
-      //Success
-      this.$Progress.finish();
-    })
-    .catch(() => {
-      //Error
-      this.$Progress.fail();
-    });
+    this.loadUsers();
 
     Fire.$on('AfterCreate', () => {
-      this.$Progress.start();
-      this.loadUsers()
-      .then(() => {
-        //Success
-        this.$Progress.finish();
-      })
-      .catch(() => {
-        //Error
-        this.$Progress.fail();
-      });
+      this.loadUsers();
     })
     //setInterval(() => this.loadUsers(), 3000);
   }

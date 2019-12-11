@@ -2186,9 +2186,15 @@ __webpack_require__.r(__webpack_exports__);
     loadUsers: function loadUsers() {
       var _this2 = this;
 
+      this.$Progress.start();
       axios.get("api/user").then(function (_ref) {
         var data = _ref.data;
+
+        _this2.$Progress.finish();
+
         return _this2.users = data.data;
+      })["catch"](function () {
+        _this2.$Progress.fail();
       });
     },
     createUser: function createUser() {
@@ -2227,23 +2233,9 @@ __webpack_require__.r(__webpack_exports__);
     var _this5 = this;
 
     this.$Progress.start();
-    this.loadUsers().then(function () {
-      //Success
-      _this5.$Progress.finish();
-    })["catch"](function () {
-      //Error
-      _this5.$Progress.fail();
-    });
+    this.loadUsers();
     Fire.$on('AfterCreate', function () {
-      _this5.$Progress.start();
-
-      _this5.loadUsers().then(function () {
-        //Success
-        _this5.$Progress.finish();
-      })["catch"](function () {
-        //Error
-        _this5.$Progress.fail();
-      });
+      _this5.loadUsers();
     }); //setInterval(() => this.loadUsers(), 3000);
   }
 });
