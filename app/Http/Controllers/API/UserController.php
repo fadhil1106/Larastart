@@ -33,7 +33,6 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-
         $this->validate($request, [
             'name'      => 'required|string|max:191',
             'email'     => 'required|string|email|max:191|unique:users,email',
@@ -59,6 +58,39 @@ class UserController extends Controller
     public function show($id)
     {
         //
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = auth('api')->user();
+
+        $this->validate($request, [
+            'name'      => 'required|string|max:191',
+            'email'     => 'required|string|email|max:191|unique:users,email,'.$user->id,
+            'password'  => 'sometimes|min:6|nullable'
+        ]);
+        
+        $currentPhoto = $user->photo;
+        if($request->photo != $currentPhoto){
+            $name = time().".".explode('/',explode(';',$request->photo)[0])[1];
+            \Image::make($request->photo)->save(public_path('img/profile/').$name);
+
+            $request->merge(['photo' => $name]);
+        }
+
+        if (!empty($request->password)) {
+            $request->merge(['password' => Hash::make($request['password'])]);
+            $user->update($request->all());
+        }else{
+            $user->update($request->except('password'));
+        }
+
+        //$user->update($request->all());
+    }
+    
+    public function profile()
+    {
+        return auth('api')->user();
     }
 
     /**
