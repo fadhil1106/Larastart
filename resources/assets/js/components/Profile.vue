@@ -3,7 +3,15 @@
   background-position: center center;
   background-size: cover;
   height: 250px !important;
-  background-image: url("/img/user-cover.jpg");
+}
+.img-profile{
+  height: 200px !important;
+  width: 200px !important;
+}
+.widget-user-profile{
+  left: 40% !important;
+  top: 6% !important;
+  margin-left: 0% !important;
 }
 </style>
 
@@ -13,13 +21,14 @@
       <div class="col-md-12 mt-3">
         <div class="card card-widget widget-user">
           <!-- Add the bg color to the header using any of the bg-* classes -->
-          <div class="widget-user-header text-white blue-gradient" style>
-            <h3 class="widget-user-username text-right">Elizabeth Pierce</h3>
-            <h5 class="widget-user-desc text-right">Web Designer</h5>
+          <div class="widget-user-header text-white blue-gradient" style="background-image: url('./img/user-cover.jpg')">
+            <h3 class="widget-user-username text-right">{{ form.name }}</h3>
+            <h5 class="widget-user-desc text-right">{{ form.email }}</h5>
+            <div class="widget-user-profile widget-user-image">
+              <img class="img-circle img-profile" :src="getProfilePhoto()" alt="User Avatar" />
           </div>
-          <div class="widget-user-image">
-            <img class="img-circle" src alt="User Avatar" />
           </div>
+          
           <div class="card-footer">
             <div class="row">
               <div class="col-sm-4 border-right">
@@ -164,6 +173,7 @@
 export default {
   data() {
     return {
+      currentPhoto:"",
       form: new Form({
         id: "",
         name: "",
@@ -177,11 +187,17 @@ export default {
   },
 
   methods: {
+    getProfilePhoto(){
+      let profilePhoto = (this.form.photo.match(/\//) ? this.currentPhoto : this.form.photo);
+      return "img/profile/"+profilePhoto;
+    },
+
     updateInfo(){
       this.$Progress.start();
       this.form.put('api/profile')
       .then(() => {
         this.$Progress.finish();
+        Fire.$emit('loadProfile');
         toast.fire({
           icon: 'success',
           title: 'Profile updated successfully'
@@ -214,6 +230,20 @@ export default {
           'error'
         )
       }
+    },
+
+    loadProfile(){
+      this.$Progress.start();
+      axios
+        .get("api/profile")
+        .then(({ data }) => {
+          this.$Progress.finish();
+          this.currentPhoto = data.photo;
+          return this.form.fill(data);
+        })
+        .catch(() => {
+          this.$Progress.fail();
+        });
     }
   },
 
@@ -222,16 +252,11 @@ export default {
   },
 
   created() {
-    this.$Progress.start();
-    axios
-      .get("api/profile")
-      .then(({ data }) => {
-        this.$Progress.finish();
-        return this.form.fill(data);
-      })
-      .catch(() => {
-        this.$Progress.fail();
-      });
+    this.loadProfile();
+
+    Fire.$on('loadProfile', () => {
+      this.loadProfile();
+    })
   }
 };
 </script>

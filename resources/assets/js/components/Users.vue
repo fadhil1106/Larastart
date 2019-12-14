@@ -262,7 +262,6 @@ export default {
     }
   },
   created() {
-    this.$Progress.start();
 
     this.loadUsers();
 
