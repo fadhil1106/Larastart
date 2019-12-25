@@ -35,6 +35,7 @@ window.toast = Toast;
 window.Form = Form;
 Vue.component(HasError.name, HasError)
 Vue.component(AlertError.name, AlertError)
+Vue.component('pagination', require('laravel-vue-pagination'));
 
 import VueRouter from 'vue-router'
 Vue.use(VueRouter)
@@ -65,6 +66,10 @@ const routes = [
     { 
       path: '/profile', 
       component: require('./components/Profile.vue').default 
+    },
+    { 
+      path: '*', 
+      component: require('./components/NotFound.vue').default 
     }
   ]
 
