@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="row mt-4 justify-content-center">
+    <div class="row mt-4 justify-content-center" v-if="$gate.isAllowedAccessUsers()">
       <div class="col-md-12">
         <div class="card">
           <div class="card-header">
@@ -49,6 +49,12 @@
           <!-- /.card-body -->
         </div>
         <!-- /.card -->
+      </div>
+    </div>
+
+    <div class="row mt-4 justify-content-center" v-if="!$gate.isAllowedAccessUsers()">
+      <div class="col-md-8">
+        <not-found></not-found>
       </div>
     </div>
 
@@ -168,7 +174,7 @@ export default {
       })
     };
   },
-
+  
   methods: {
     editModal(user){
       this.editmode = true;
@@ -203,23 +209,25 @@ export default {
             this.$Progress.finish();
             Fire.$emit('AfterCreate');
           }).catch(()=>{
-            Swal("Failed!", "There was something wrong.", "warning");
+            this.$Progress.fail();
+            Swal.fire("Failed!", "There was something wrong.", "warning");
           })
-         
         }
       })
     },
 
     loadUsers(){
-      this.$Progress.start();
-      axios.get("api/user")
-      .then(({ data }) => { 
-        this.$Progress.finish();
-        return this.users = data.data
-      })
-      .catch(() => {
-        this.$Progress.fail();
-      })
+      if (this.$gate.isAllowedAccessUsers()) {
+        this.$Progress.start();
+        axios.get("api/user")
+        .then(({ data }) => { 
+          this.$Progress.finish();
+          return this.users = data.data
+        })
+        .catch(() => {
+          this.$Progress.fail();
+        })
+      }
     },
 
     createUser(){
@@ -237,6 +245,7 @@ export default {
       })
       .catch(() => {
         this.$Progress.fail();
+        Swal.fire("Failed!", "There was something wrong.", "warning");
       })
     },
 
@@ -253,11 +262,10 @@ export default {
           'Your data has been updated.',
           'success'
         )
-
         this.$Progress.finish();
-      })
-      .catch(() => {
-        //Error
+      }).catch(() => {
+        this.$Progress.fail();
+        Swal.fire("Failed!", "There was something wrong.", "warning");
       });
     }
   },

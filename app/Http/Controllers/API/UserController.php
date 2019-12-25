@@ -22,7 +22,10 @@ class UserController extends Controller
      */
     public function index()
     {
-        return User::latest()->paginate(10);
+        // $this->authorize('isAdmin');
+        if (\Gate::allows('isAdmin') || \Gate::allows('isAuthor')) {
+            return User::latest()->paginate(10);
+        }
     }
 
     /**
@@ -33,6 +36,8 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('isAdmin');
+
         $this->validate($request, [
             'name'      => 'required|string|max:191',
             'email'     => 'required|string|email|max:191|unique:users,email',
@@ -90,8 +95,7 @@ class UserController extends Controller
             $user->update($request->except('password'));
         }
 
-        return ['message' => $request->photo];
-        //$user->update($request->all());
+        // return ['message' => $request->photo];
     }
     
     public function profile()
@@ -108,6 +112,8 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $this->authorize('isAdmin');
+
         $user = User::findOrFail($id);
         $this->validate($request, [
             'name'      => 'required|string|max:191',
@@ -126,6 +132,8 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
+        $this->authorize('isAdmin');
+
         $user = User::findOrFail($id);
 
         // delete user

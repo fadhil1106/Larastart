@@ -5,13 +5,16 @@
   height: 250px !important;
 }
 .img-profile{
-  height: 200px !important;
-  width: 200px !important;
+  height: auto !important;
+  width: 100% !important;
+  max-width: 190px;
 }
 .widget-user-profile{
   left: 40% !important;
-  top: 6% !important;
-  margin-left: 0% !important;
+}
+
+.widget-user-profile > img{
+  border: 3px solid #ffffff;
 }
 </style>
 
@@ -24,7 +27,7 @@
           <div class="widget-user-header text-white blue-gradient" style="background-image: url('./img/user-cover.jpg')">
             <h3 class="widget-user-username text-right">{{ form.name }}</h3>
             <h5 class="widget-user-desc text-right">{{ form.email }}</h5>
-            <div class="widget-user-profile widget-user-image">
+            <div class="widget-user-profile">
               <img class="img-circle img-profile" :src="getProfilePhoto()" alt="User Avatar" />
           </div>
           </div>
