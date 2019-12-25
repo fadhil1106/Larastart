@@ -17,7 +17,7 @@ export default class Gate{
     }
 
     isAllowedAccessUsers(){
-        if (this.isAdmin || this.isAuthor) {
+        if (this.isAdmin() || this.isAuthor()) {
             return true;
         }
     }
