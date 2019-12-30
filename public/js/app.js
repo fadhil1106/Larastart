@@ -2556,6 +2556,13 @@ __webpack_require__.r(__webpack_exports__);
     var _this6 = this;
 
     this.loadUsers();
+    Fire.$on('searching', function () {
+      var query = _this6.$parent.search;
+      axios.get('api/findUser?q=' + query).then(function (_ref2) {
+        var data = _ref2.data;
+        _this6.users = data;
+      })["catch"](function () {});
+    });
     Fire.$on('AfterCreate', function () {
       _this6.loadUsers();
     }); //setInterval(() => this.loadUsers(), 3000);
@@ -7901,7 +7908,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "\n.widget-user-header {\n  background-position: center center;\n  background-size: cover;\n  height: 250px !important;\n}\n.img-profile{\n  height: auto !important;\n  width: 100% !important;\n  max-width: 190px;\n}\n.widget-user-profile{\n  left: 40% !important;\n}\n.widget-user-profile > img{\n  border: 3px solid #ffffff;\n}\n", ""]);
+exports.push([module.i, "\n.widget-user-header {\n  background-position: center center;\n  background-size: cover;\n  height: 250px !important;\n}\n.img-profile{\n  height: auto !important;\n  width: 100% !important;\n  max-width: 150px;\n}\n.widget-user-profile{\n  left: 40% !important;\n}\n.widget-user-profile > img{\n  border: 3px solid #ffffff;\n}\n", ""]);
 
 // exports
 
@@ -62432,7 +62439,7 @@ var render = function() {
                 { staticClass: "card-footer" },
                 [
                   _c("pagination", {
-                    attrs: { data: _vm.users },
+                    attrs: { data: _vm.users, align: "center" },
                     on: { "pagination-change-page": _vm.getResults }
                   })
                 ],
@@ -79110,7 +79117,15 @@ Vue.component('not-found', __webpack_require__(/*! ./components/NotFound.vue */ 
 Vue.component('example-component', __webpack_require__(/*! ./components/ExampleComponent.vue */ "./resources/assets/js/components/ExampleComponent.vue"));
 var app = new Vue({
   el: '#app',
-  router: router
+  router: router,
+  data: {
+    search: ''
+  },
+  methods: {
+    searchit: function searchit() {
+      Fire.$emit('searching');
+    }
+  }
 });
 
 /***/ }),

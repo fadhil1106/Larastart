@@ -7,7 +7,7 @@
 .img-profile{
   height: auto !important;
   width: 100% !important;
-  max-width: 190px;
+  max-width: 150px;
 }
 .widget-user-profile{
   left: 40% !important;

@@ -48,7 +48,7 @@
           </div>
           <!-- /.card-body -->
           <div class="card-footer">
-            <pagination :data="users" @pagination-change-page="getResults"></pagination>
+            <pagination :data="users" align="center" @pagination-change-page="getResults"></pagination>
           </div>
         </div>
         <!-- /.card -->
@@ -280,14 +280,23 @@ export default {
     }
   },
   created() {
-
     this.loadUsers();
+
+    Fire.$on('searching', () => {
+      let query = this.$parent.search;
+      axios.get('api/findUser?q=' + query)
+      .then(({data}) => {
+        this.users = data;
+      })
+      .catch(() => {
+
+      })
+    })
 
     Fire.$on('AfterCreate', () => {
       this.loadUsers();
     })
     //setInterval(() => this.loadUsers(), 3000);
   }
-
 };
 </script>
